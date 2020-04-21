@@ -7,8 +7,8 @@ function renderLineChart({data}) {
     <AreaChart data={data}>
         <CartesianGrid strokeDasharray="3 " />
         <Tooltip />
-        <XAxis dataKey="date"/>
-        <YAxis />
+        <XAxis dataKey="date" stroke="white"/>
+        <YAxis stroke="white"/>
         <Area type="monotone" dataKey="cases" stackId="1" stroke="#8884d8" fill="#8884d8">
         </Area>
         <Area type="monotone" dataKey="deaths" stackId="2" stroke="#990a06" fill="#990a06" />

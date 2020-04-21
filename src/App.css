@@ -3,18 +3,34 @@
 }
 
 .App-container {
-  background-color: #343A40;
+  background-color: #27292c;
   color: white;
-}
-
-.chart {
-  color: black;
 }
 
 .btn-group {
   margin: auto;
+  margin-bottom: 20px;
   display: flex;
   max-width: 300px;
   flex-direction: row;
   justify-content: center;
+}
+
+.content {
+  padding: 10px;
+  background-color: #343A40;
+  margin: 20px 0px 20px 0px;
+  border: 1px solid #454D55;
+}
+
+.content-chart {
+  padding: 10px;
+  margin-bottom: 20px;
+  color: black;
+  margin: 20px 0px 20px 0px;
+  background-color: #343A40;
+  border: 1px solid #454D55;
+}
+
+.chart {
 }

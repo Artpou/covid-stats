@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-import { Form, ToggleButton, ToggleButtonGroup, ButtonGroup, Container, Navbar, Nav, Button } from 'react-bootstrap';
+import { Form, ToggleButton, ToggleButtonGroup, ButtonGroup, Container, Navbar, Nav, Button, Card } from 'react-bootstrap';
 import Chart from './Chart';
 import Table from './Table';
 import CountryData from './CountryData';
@@ -11,13 +11,13 @@ class App extends Component {
     super(props);
 
     this.data = [];
-    this.countries = [];
+    this.lastData = [];
 
     this.state = { 
       data: [],
       select: "France",
       range: 31,
-      mode: "global"
+      mode: "global",
     };
 
     this.handleChangeCountry = this.handleChangeCountry.bind(this);
@@ -27,14 +27,21 @@ class App extends Component {
   }
 
   getCountry() {
+    var name = [];
     this.data.forEach(d => {
-      if (!this.countries.includes(d.location))
-        this.countries.push(d.location);
+      if (!name.includes(d.location)) {
+        name.push(d.location);
+        this.lastData.push(d);
+      } else {
+        this.lastData[this.lastData.length-1].total_cases = d.total_cases;
+      }
     });
-    this.countries.sort();
+    this.lastData.sort(function(a, b){
+      return b.total_cases-a.total_cases
+    })
+    console.log(this.lastData);
   }
 
-  
   componentDidMount() {
     d3.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv")
     .then(data => {
@@ -46,10 +53,10 @@ class App extends Component {
   
   filterData() {
     var minDate = new Date(Date.now());
+    var newData = [];
+    
     minDate.setDate(minDate.getDate()-this.state.range);
     var dataFilter = this.data.filter(d => (d.location === this.state.select && new Date(d.date) > minDate));
-    var newData = [];
-    var max = {cases: 0, deaths: 0};
 
     dataFilter.forEach(element => {
       if(this.state.mode === "global") {
@@ -66,16 +73,11 @@ class App extends Component {
           cases: element.new_cases,
           deaths: element.new_deaths,
         });
-        if (element.new_cases > max.cases) max.cases = element.new_cases;
-        if (element.new_deaths > max.deaths) max.cases = element.new_deaths;
       }      
     });
 
-
     console.log("location : "+this.state.select+", range : "+this.state.range);
-    console.log(newData);
     this.setState({data: newData});
-    this.setState({max: {maxDeaths: }})
   }
 
   handleChangeCountry(event) {
@@ -115,44 +117,45 @@ class App extends Component {
         </Nav>
       </Navbar>
 
-
       <Container>
-        <Form.Group controlId="exampleForm.ControlSelect1">
-          <Form.Label>Pays : </Form.Label>
-          <Form.Control as="select" onChange={this.handleChangeCountry}>
-              {this.countries.map((country) => (
-                <option selected={country === this.state.select}>{country}</option>
-              ))}
-          </Form.Control>
-          <CountryData data={this.state.data} mode={this.state.mode}></CountryData>
-        </Form.Group>
+        <div className="content">
+          <Form.Group controlId="exampleForm.ControlSelect1">
+            <Form.Control size="lg" as="select" onChange={this.handleChangeCountry}>
+                {this.lastData.map((country) => (
+                  <option key={country.location} selected={country.location === this.state.select}>{country.location}</option>
+                ))}
+            </Form.Control>
+            <CountryData data={this.state.data} mode={this.state.mode}></CountryData>
+          </Form.Group>
 
 
-        <ButtonGroup toggle onChange={this.handleChangeMode}>
-          <ToggleButton type="radio" name="radio" defaultChecked value="global">
-            global
-          </ToggleButton>
-          <ToggleButton  type="radio" name="radio" value="par_jour">
-            par jour
-          </ToggleButton>
-        </ButtonGroup>
+          <ButtonGroup toggle onChange={this.handleChangeMode}>
+            <ToggleButton type="radio" name="radio" defaultChecked value="global">
+              global
+            </ToggleButton>
+            <ToggleButton  type="radio" name="radio" value="par_jour">
+              par jour
+            </ToggleButton>
+          </ButtonGroup>
 
-        <div className="chart">
+          <ButtonGroup toggle onChange={this.handleChangeRange}>
+            <ToggleButton type="radio" name="radio" defaultChecked value={7}>
+              semaine
+            </ToggleButton>
+            <ToggleButton  type="radio" name="radio" value={31}>
+              mois
+            </ToggleButton>
+            <ToggleButton type="radio" name="radio" value={365}>
+              année
+            </ToggleButton>
+          </ButtonGroup>
+        </div>
+        
+        <div className="content-chart">
           <Chart data={this.state.data}></Chart>
         </div>
 
-        <ButtonGroup toggle onChange={this.handleChangeRange}>
-          <ToggleButton type="radio" name="radio" defaultChecked value={7}>
-            semaine
-          </ToggleButton>
-          <ToggleButton  type="radio" name="radio" value={31}>
-            mois
-          </ToggleButton>
-          <ToggleButton type="radio" name="radio" value={365}>
-            année
-          </ToggleButton>
-        </ButtonGroup>
-        <Table data={this.state.data} mode={this.state.mode}></Table>
+        <Table data={this.state.data} mode={this.state.mode} max={this.state.max}></Table>
       </Container>
       </div>
     );
