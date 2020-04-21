@@ -2,9 +2,13 @@
   text-align: center;
 }
 
-body {
-  background-color: #282c34;
+.App-container {
+  background-color: #343A40;
   color: white;
+}
+
+.chart {
+  color: black;
 }
 
 .btn-group {
