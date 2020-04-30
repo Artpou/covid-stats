@@ -4,7 +4,9 @@
 
 .App-container {
   background-color: #27292c;
+  min-height: 100vh;
   color: white;
+  align-items: center;
 }
 
 .btn-group {
@@ -21,16 +23,4 @@
   background-color: #343A40;
   margin: 20px 0px 20px 0px;
   border: 1px solid #454D55;
-}
-
-.content-chart {
-  padding: 10px;
-  margin-bottom: 20px;
-  color: black;
-  margin: 20px 0px 20px 0px;
-  background-color: #343A40;
-  border: 1px solid #454D55;
-}
-
-.chart {
 }

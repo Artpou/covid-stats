@@ -1,10 +1,14 @@
-import React, {Component} from 'react';
+import React, {Component, useState} from 'react';
+import ReactDOM from "react-dom";
+import ReactTooltip from "react-tooltip";
+
 import './App.css';
-import { Form, ToggleButton, ToggleButtonGroup, ButtonGroup, Container, Navbar, Nav, Button, Card } from 'react-bootstrap';
-import Chart from './Chart';
-import Table from './Table';
-import CountryData from './CountryData';
+import { Form, ToggleButton, ButtonGroup, Container, Navbar, Nav } from 'react-bootstrap';
+import Chart from './MainChart/Chart';
+import Table from './MainChart/Table';
+import CountryData from './MainChart/CountryData';
 import * as d3 from 'd3';
+import WorldMap from './WorldMap/WorldMap';
 
 class App extends Component {
   constructor(props) {
@@ -18,12 +22,24 @@ class App extends Component {
       select: "France",
       range: 31,
       mode: "global",
+      tooltip: "4",
     };
 
     this.handleChangeCountry = this.handleChangeCountry.bind(this);
     this.handleChangeRange = this.handleChangeRange.bind(this);
     this.handleChangeMode = this.handleChangeMode.bind(this);
+    this.handleChangeTooltip = this.handleChangeTooltip.bind(this);
     this.filterData = this.filterData.bind(this);
+  }
+
+  componentDidMount() {
+    console.log("update");
+    d3.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv")
+    .then(data => {
+      this.data = data;
+      this.getCountry();
+      this.filterData();
+    });
   }
 
   getCountry() {
@@ -40,15 +56,6 @@ class App extends Component {
       return b.total_cases-a.total_cases
     })
     console.log(this.lastData);
-  }
-
-  componentDidMount() {
-    d3.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv")
-    .then(data => {
-      this.data = data;
-      this.getCountry();
-      this.filterData();
-    });
   }
   
   filterData() {
@@ -104,6 +111,13 @@ class App extends Component {
     });
   }
 
+  handleChangeTooltip(value) {
+    console.log(value);
+    this.setState({
+      tooltip: value
+    });
+  }
+
   render() {
     return (
       <div className="App-container">
@@ -116,6 +130,11 @@ class App extends Component {
           <Nav.Link href="#pricing">About</Nav.Link>
         </Nav>
       </Navbar>
+
+      <div data-tip={this.state.tooltip}>
+        <ReactTooltip ></ReactTooltip>
+        <WorldMap data={this.lastData} setTooltip={this.handleChangeTooltip}></WorldMap>
+      </div>
 
       <Container>
         <div className="content">
