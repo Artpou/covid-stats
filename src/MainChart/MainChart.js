@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
+import Select from 'react-select'
 import { Form, ToggleButton, ButtonGroup, Container } from 'react-bootstrap';
 import './MainChart.css';
 import Chart from './Chart';
 import Table from './Table';
 import CountryData from './CountryData';
+import getCountryISO2 from "country-iso-3-to-2";
 
 class MainChart extends Component {
   constructor(props) {
@@ -11,6 +13,32 @@ class MainChart extends Component {
 
     this.data = props.data;
     this.lastData = props.lastData;
+
+    this.country = this.lastData.map(d => {
+      const src = getCountryISO2(d.iso_code) ?
+      "https://www.countryflags.io/"+ getCountryISO2(d.iso_code).toLowerCase()+"/flat/32.png"
+      :
+      "https://image.flaticon.com/icons/svg/814/814513.svg";
+      
+      const container = {};
+      container.value = d.location;
+      container.label = 
+      <div>
+        <img src={src} style={{marginRight: 10, height: 32}}/>
+        {d.location}
+        <i style={{ color: "#aaaaaa", marginLeft: 10}}>
+          {d.total_cases.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} cas
+        </i>
+      </div>;
+      return container;
+    });
+
+    this.style = {
+      valueContainer: () => ({
+        // none of react-select's styles are passed to <Control />
+        padding: 10,
+      }),
+    }
 
     this.state = { 
       currentData: [],
@@ -24,6 +52,11 @@ class MainChart extends Component {
     this.handleChangeMode = this.handleChangeMode.bind(this);
     this.handleChangeTooltip = this.handleChangeTooltip.bind(this);
     this.filterData = this.filterData.bind(this);
+    this.getCountry = this.getCountry.bind(this);
+  }
+
+  spacesNumber(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
 
   componentDidMount() {
@@ -37,10 +70,21 @@ class MainChart extends Component {
     ));
     this.setState({currentData: tmp}, () => {console.log(tmp)});
   }
-  
+
+  getCountry() {
+    var t = this.lastData.map(d => {
+      const container = {};
+      container.value = d.location;
+      container.label = d.location;
+      return container;
+    });
+    console.log(t);
+    return t;
+  }
+
   handleChangeCountry(event) {
     this.setState({
-      select: event.target.value
+      select: event.value
     }, () => {
       this.filterData();
     });
@@ -73,14 +117,12 @@ class MainChart extends Component {
     return (
       <Container>
         <div className="content">
-          <Form.Group controlId="exampleForm.ControlSelect1">
-            <Form.Control size="lg" as="select" onChange={this.handleChangeCountry}>
-                {this.lastData.map((d) => (
-                  <option key={d.location} selected={d.location === this.state.select}>{d.location}</option>
-                ))}
-            </Form.Control>
-            <CountryData data={this.state.currentData} mode={this.state.mode}></CountryData>
-          </Form.Group>
+
+            <Select
+              styles={this.style}
+              options={this.country}
+              onChange={this.handleChangeCountry}
+              value={this.country.filter(d => d.value === this.state.select)}/>
 
           <ButtonGroup toggle onChange={this.handleChangeMode}>
             <ToggleButton type="radio" name="radio" defaultChecked value="global">

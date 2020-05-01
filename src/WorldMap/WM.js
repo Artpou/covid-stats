@@ -12,7 +12,7 @@ class WorldMap extends Component {
     constructor(props) {
         super(props);
 
-        this.data = props.data;
+        this.data = props.lastData;
 
         this.colorScale = d3.scaleLinear()
           .domain([0, 0.5, 1])
@@ -30,7 +30,7 @@ class WorldMap extends Component {
     }
 
     componentDidMount() {
-        //this.filterData();
+        this.filterData();
     }
 
     filterData() {
@@ -49,6 +49,12 @@ class WorldMap extends Component {
     }
 
     render() {
+            //only countries
+    const max = (this.data.length > 0) ?
+    Math.max.apply(Math, this.data.map(function(o) {
+       if(o.iso_code) return o.total_cases; return null;
+    })) : 0;
+
         return (
             <Container className="worldmap-content" data-tip={this.state.tooltip}>
             
@@ -69,6 +75,30 @@ class WorldMap extends Component {
                 setTooltip={(value) => this.setState(({tooltip:value}))}
                 colorScale={this.colorScale}>
             </World>
+
+            <ComposableMap>
+            {this.data.length > 0 && (
+                <Geographies geography={"https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json"}>
+                {           
+                    ({ geographies }) =>
+                        geographies.map(geo => {
+                            const d = this.data.find(s => s.iso_code === geo.properties.ISO_A3);
+                            console.log(geographies);
+                            return (
+                            <Geography
+                                key={geo.rsmKey}
+                                onMouseEnter={() => {
+                                }}
+                                onMouseLeave={() => {
+                                }}
+                                geography={geo}
+                            />
+                            );
+                    })
+                }
+                </Geographies>
+            )}
+            </ComposableMap>
 
             <Scale data={this.state.currentData} setFilter={(value) => this.setState(({data:value}))}></Scale>
         </Container> 

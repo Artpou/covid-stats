@@ -13,7 +13,7 @@ function CountryData({data, mode}) {
                           :
                           data[data.length-1].new_cases}
                         </h5>
-                        <h5>cas confirmés :
+                        <h5>morts confirmés :
                         {mode === "global" ?
                           data[data.length-1].total_deaths
                           :
