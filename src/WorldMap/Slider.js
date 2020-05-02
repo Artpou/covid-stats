@@ -2,31 +2,32 @@ import React, { useState, useEffect } from 'react';
 import RangeSlider from 'react-bootstrap-range-slider';
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
-function filterData(data) {
-  var tmp = data.filter(d => (
-    d.location === this.state.select &&
-    new Date(d.date) > new Date(Date.now()).setDate(new Date(Date.now()).getDate()-this.state.range)
-  ));
-  this.setState({currentData: tmp}, () => {console.log(tmp)});
-}
+const Slider = ({data, min, setFilter}) => {
+  const [ value, setValue ] = useState(0);
+  var minDay = (new Date(min)-new Date(Date.now())) / (1000 * 3600 * 24);
 
-function Slider({data, setFilter}) {
-    const [ value, setValue ] = useState(10);
+  function filterData(day) {
+    var date = new Date();
+    date.setDate(date.getDate()-day);
+    date = date.toLocaleDateString();
+    return data.filter(d => (
+      date === new Date(d.date).toLocaleDateString()
+    ));
+  }    
 
-    var d = new Date(Date.now());
-    d.setDate(d.getDate()-5);
-    
-    return (
-      <RangeSlider
+  return (
+    <RangeSlider
         value={value}
-        max={10}
+        min={Math.round(minDay)}
+        max={0}
         variant='light'
         onChange={event => {
-            if(event.target.value !== value)
-                setValue(Number(event.target.value))
+              setValue(Number(event.target.value));
+              console.log(event.target.value);
+              setFilter(filterData(-event.target.value));
         }}
-      />
-    );
+    />
+  );
 }
 
 export default Slider;

@@ -12,6 +12,7 @@ export const App2 = () =>  {
   const [lastData, setLastData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState("chart");
+  const [date, setDate] = useState();
 
   const override = css`
   display: block;
@@ -21,10 +22,11 @@ export const App2 = () =>  {
   margin-right: auto;
   margin-top: 40vh;
   width: 100px;
-`;
+  `;
 
   async function loadData() {
     var tmp = [];
+    var min;
     d3.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv", function (d) {
       if (!tmp.some(e => e.location === d.location)) {
         //ajout du nouveau pays
@@ -35,10 +37,15 @@ export const App2 = () =>  {
         //this.lastData[this.lastData.length - 1].total_cases = d.total_cases;
         tmp[tmp.length-1] = d;
       }
+      if(!min || d.date < min) {
+        min = d.date;
+        console.log(min);
+      }
       return d;
     })
     .then(loaded => {
       setData(loaded);
+      setDate(min);
       //tri des pays en fonction des cas
       tmp.sort(function (a, b) {
         return b.total_cases - a.total_cases
@@ -72,7 +79,7 @@ export const App2 = () =>  {
             <Nav.Link>About</Nav.Link>
           </Nav>
         </Navbar>
-        <loadData></loadData>
+
         {loading ? 
           <Container className="justify-content-md-center">
             <ScaleLoader
@@ -84,7 +91,7 @@ export const App2 = () =>  {
         : 
           {
             'chart': <MainChart data={data} lastData={lastData}></MainChart>,
-            'worldmap': <WorldMap data={lastData} lastData={lastData}></WorldMap>
+            'worldmap': <WorldMap data={data} lastData={lastData} min={date}></WorldMap>
           }[page]
         }
       </div>
