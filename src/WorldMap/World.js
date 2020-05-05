@@ -9,7 +9,7 @@ const geoUrl =
 
 const Scale = ({theme,max}) =>  {
     return (
-    <Row style={{marginTop: -20}}>
+    <Row style={{marginTop: -20, marginLeft: 10, marginRight:10}}>
         {[0,0.2,0.4,0.6,0.8,1].map((n) => (
             <Col style={{backgroundColor: colorScale(n,theme), textAlign: "right"}}>{Math.round(Math.pow(max,n))}</Col>
         ))}
@@ -25,7 +25,7 @@ function colorScale(n, theme) {
 }
 
 
-function World({data, setTooltip, theme}) {
+function World({data, mode, setTooltip, theme}) {
     //only countries
     const max = (data.length > 0) ?
      Math.max.apply(Math, data.map(function(o) {
@@ -56,7 +56,7 @@ function World({data, setTooltip, theme}) {
                                     }
                                 }}
                                 geography={geo}
-                                fill={d ? colorScale(Math.log(d.total_cases)/Math.log(max), theme) : "#616161"}
+                                fill={d ? colorScale(Math.log(d.total_cases)/Math.log(max), theme) : theme.background}
                             />
                             );
                         })

@@ -88,7 +88,7 @@ export const App = () =>  {
               <Nav.Link onClick={() => {setPage("worldmap")}}>Worldmap</Nav.Link>
               <Nav.Link  onClick={() => {setPage("about")}}>About</Nav.Link>
             </Nav>
-              <Button onClick={toggleTheme} >{theme.toggle}</Button>
+              <Button variant={theme.button_mode} onClick={toggleTheme} >{theme.toggle}</Button>
           </Navbar>
 
           <ThemeContext.Provider value={theme}>
