@@ -1,12 +1,26 @@
+body {
+  background-color: aqua;
+}
+
 .App {
   text-align: center;
 }
 
-.App-container {
-  background-color: #27292c;
+.app-container {
+  background-color: #F8F9FA;
   min-height: 100vh;
   align-items: center;
 }
+
+.app-container-dark {
+  background-color: #202225;
+  min-height: 100vh;
+  align-items: center;
+}
+  .app-container-dark .card {
+    background-color: #343A40;
+  }
+
 
 .btn-group {
   margin: auto;
@@ -17,9 +31,7 @@
   justify-content: center;
 }
 
-.content {
+.card {
   padding: 10px;
-  background-color: #F0F2F5;
-  margin: 20px 0px 20px 0px;
-  border: 1px solid #454D55;
+  margin: 25px;
 }

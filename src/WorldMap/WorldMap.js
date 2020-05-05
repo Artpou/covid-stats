@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 import { Container } from 'react-bootstrap';
 import Scale from './Slider';
 import World from './World';
+import { ThemeContext } from '../Themes';
 
 class WorldMap extends Component {
     constructor(props) {
@@ -12,10 +13,6 @@ class WorldMap extends Component {
 
         this.min = props.min;
         this.data = props.data;
-
-        this.colorScale = d3.scaleLinear()
-          .domain([0, 0.5, 1])
-          .range(["#ffffff", "#ffc500","#990a06"]);
 
         this.state = { 
             tooltip: "",
@@ -39,31 +36,41 @@ class WorldMap extends Component {
 
     render() {
         return (
-            <Container className="worldmap-content" data-tip={this.state.tooltip}>
+            <ThemeContext.Consumer>
+            {theme => (
+                <Container className="worldmap-content" data-tip={this.state.tooltip}>
+                    
+                    <ReactTooltip >
+                        {this.state.tooltip &&
+                            (
+                            <div>
+                            <h5>{this.state.tooltip.location}</h5>
+                            <h6>cas : {this.convert(this.state.tooltip.total_cases)}</h6>
+                            <h6>morts : {this.convert(this.state.tooltip.total_deaths)}</h6>
+                            <i>{this.state.tooltip.date}</i>
+                            </div>
+                            )
+                        }
+                    </ReactTooltip>
+
+                            
+                    <World
+                        data={this.state.currentData}
+                        setTooltip={(value) => this.setState(({tooltip:value}))}
+                        colorScale={this.colorScale}
+                        theme={theme}>
+                    </World>
+
+                    <Scale data={this.data} min={this.min} setFilter={(value) => this.setState(({currentData:value}))}></Scale>
+                </Container> 
+            )
+            }
+            </ThemeContext.Consumer>
             
-            <ReactTooltip >
-                {this.state.tooltip &&
-                    (
-                    <div>
-                    <h5>{this.state.tooltip.location}</h5>
-                    <h6>cas : {this.convert(this.state.tooltip.total_cases)}</h6>
-                    <h6>morts : {this.convert(this.state.tooltip.total_deaths)}</h6>
-                    <i>{this.state.tooltip.date}</i>
-                    </div>
-                    )
-                }
-            </ReactTooltip>
-
-            <World
-                data={this.state.currentData}
-                setTooltip={(value) => this.setState(({tooltip:value}))}
-                colorScale={this.colorScale}>
-            </World>
-
-            <Scale data={this.data} min={this.min} setFilter={(value) => this.setState(({currentData:value}))}></Scale>
-        </Container> 
         );
     }
 }
+
+WorldMap.contextType = ThemeContext;
 
 export default WorldMap;

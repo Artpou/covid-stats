@@ -29,15 +29,16 @@ const ColoredRow = ({data, max}) => (
     </tr>
 );
 
-function Table({data, mode}) {
+function Table({data, mode, theme}) {
   var max = {cases: 0, deaths: 0};
+
   if(mode !== "global") {
     max.cases = Math.max.apply(Math, data.map(function(o) { return o.new_cases; }));
     max.deaths = Math.max.apply(Math, data.map(function(o) { return o.new_deaths; }));
   } 
 
   return (
-    <Tab bordered hover variant="dark">
+    <Tab bordered hover variant={theme.variant}>
       <thead>
       <tr>
         <th>date</th>

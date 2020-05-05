@@ -1,184 +1,116 @@
-import React, {Component, useState} from 'react';
-import ReactDOM from "react-dom";
-import ReactTooltip from "react-tooltip";
-
-import './App.css';
-import { Form, ToggleButton, ButtonGroup, Container, Navbar, Nav } from 'react-bootstrap';
-import Chart from './MainChart/Chart';
-import Table from './MainChart/Table';
-import CountryData from './MainChart/CountryData';
+import React, { useState, useEffect} from 'react';
+import { Navbar, Nav, Container, Button, FormCheck } from 'react-bootstrap';
 import * as d3 from 'd3';
+import { css } from "@emotion/core";
+import ScaleLoader from "react-spinners/ScaleLoader";
+import MainChart from './MainChart/MainChart';
 import WorldMap from './WorldMap/WorldMap';
+import { themes, ThemeContext } from './Themes';
+import { ThemeProvider } from 'styled-components';
+import About from './About/About';
+import { GlobalStyles } from './globalStyles';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
+const override = css`
+display: block;
+margin: 0 auto;
+border-color: red;
+margin-left: auto;
+margin-right: auto;
+margin-top: 40vh;
+width: 100px;
+`;
 
-    this.data = [];
-    this.lastData = [];
+export const App = () =>  {
+  const [data, setData] = useState([]);
+  const [lastData, setLastData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState("chart");
+  const [date, setDate] = useState();
+  const [theme, setTheme] = useState(themes.light);
+  console.log(localStorage.getItem("theme"));
 
-    this.state = { 
-      data: [],
-      select: "France",
-      range: 31,
-      mode: "global",
-      tooltip: "4",
-    };
-
-    this.handleChangeCountry = this.handleChangeCountry.bind(this);
-    this.handleChangeRange = this.handleChangeRange.bind(this);
-    this.handleChangeMode = this.handleChangeMode.bind(this);
-    this.handleChangeTooltip = this.handleChangeTooltip.bind(this);
-    this.filterData = this.filterData.bind(this);
-  }
-
-  componentDidMount() {
-    console.log("update");
-    d3.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv")
-    .then(data => {
-      this.data = data;
-      this.getCountry();
-      this.filterData();
-    });
-  }
-
-  getCountry() {
-    var name = [];
-    this.data.forEach(d => {
-      if (!name.includes(d.location)) {
-        name.push(d.location);
-        this.lastData.push(d);
-      } else {
-        this.lastData[this.lastData.length-1].total_cases = d.total_cases;
-      }
-    });
-    this.lastData.sort(function(a, b){
-      return b.total_cases-a.total_cases
-    })
-    console.log(this.lastData);
-  }
-  
-  filterData() {
-    var minDate = new Date(Date.now());
-    var newData = [];
-    
-    minDate.setDate(minDate.getDate()-this.state.range);
-    var dataFilter = this.data.filter(d => (d.location === this.state.select && new Date(d.date) > minDate));
-
-    dataFilter.forEach(element => {
-      if(this.state.mode === "global") {
-        newData.push({
-          country: element.location,
-          date: element.date,
-          cases: element.total_cases,
-          deaths: element.total_deaths,
-        });
-      } else {
-        newData.push({
-          country: element.location,
-          date: element.date,
-          cases: element.new_cases,
-          deaths: element.new_deaths,
-        });
-      }      
-    });
-
-    console.log("location : "+this.state.select+", range : "+this.state.range);
-    this.setState({data: newData});
-  }
-
-  handleChangeCountry(event) {
-    this.setState({
-      select: event.target.value
-    }, () => {
-      this.filterData();
-    });
-  }
-
-  handleChangeRange(event) {
-    this.setState({
-      range: event.target.value
-    }, () => {
-      this.filterData();
-    });
-  }
-
-  handleChangeMode(event) {
-    this.setState({
-      mode: event.target.value
-    }, () => {
-      this.filterData();
-    });
-  }
-
-  handleChangeTooltip(value) {
-    console.log(value);
-    this.setState({
-      tooltip: value
-    });
-  }
-
-  render() {
-    return (
-      <div className="App-container">
-      <Navbar bg="dark" variant="dark">
-        <Navbar.Brand href="#home">Navbar</Navbar.Brand>
-        <Nav className="mr-auto">
-          <Nav.Link href="#home" selected>Dashboard</Nav.Link>
-          <Nav.Link href="#features">Worldmap</Nav.Link>
-          <Nav.Link href="#features">Statistics</Nav.Link>
-          <Nav.Link href="#pricing">About</Nav.Link>
-        </Nav>
-      </Navbar>
-
-      <div data-tip={this.state.tooltip}>
-        <ReactTooltip ></ReactTooltip>
-        <WorldMap data={this.lastData} setTooltip={this.handleChangeTooltip}></WorldMap>
-      </div>
-
-      <Container>
-        <div className="content">
-          <Form.Group controlId="exampleForm.ControlSelect1">
-            <Form.Control size="lg" as="select" onChange={this.handleChangeCountry}>
-                {this.lastData.map((country) => (
-                  <option key={country.location} selected={country.location === this.state.select}>{country.location}</option>
-                ))}
-            </Form.Control>
-            <CountryData data={this.state.data} mode={this.state.mode}></CountryData>
-          </Form.Group>
-
-
-          <ButtonGroup toggle onChange={this.handleChangeMode}>
-            <ToggleButton type="radio" name="radio" defaultChecked value="global">
-              global
-            </ToggleButton>
-            <ToggleButton  type="radio" name="radio" value="par_jour">
-              par jour
-            </ToggleButton>
-          </ButtonGroup>
-
-          <ButtonGroup toggle onChange={this.handleChangeRange}>
-            <ToggleButton type="radio" name="radio" defaultChecked value={7}>
-              semaine
-            </ToggleButton>
-            <ToggleButton  type="radio" name="radio" value={31}>
-              mois
-            </ToggleButton>
-            <ToggleButton type="radio" name="radio" value={365}>
-              année
-            </ToggleButton>
-          </ButtonGroup>
-        </div>
-        
-        <div className="content-chart">
-          <Chart data={this.state.data}></Chart>
-        </div>
-
-        <Table data={this.state.data} mode={this.state.mode} max={this.state.max}></Table>
-      </Container>
-      </div>
+  function toggleTheme() {
+    setTheme(
+        theme === themes.dark
+          ? themes.light
+          : themes.dark,
     );
   }
+
+
+  async function loadData() {
+    var tmp = [];
+    var min;
+    d3.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv", function (d) {
+      if (!tmp.some(e => e.location === d.location)) {
+        //ajout du nouveau pays
+        tmp.push(d);
+        //setLastData([...lastData, d]);
+      } else {
+        //update du nombre de cas du pays
+        //this.lastData[this.lastData.length - 1].total_cases = d.total_cases;
+        tmp[tmp.length-1] = d;
+      }
+      if(!min || d.date < min) {
+        min = d.date;
+        console.log(min);
+      }
+      return d;
+    })
+    .then(loaded => {
+      setData(loaded);
+      setDate(min);
+      //tri des pays en fonction des cas
+      tmp.sort(function (a, b) {
+        return b.total_cases - a.total_cases
+      });
+      setLastData(tmp);
+    })
+    .then(() => {
+      setLoading(false);
+    });
+  }
+
+  useEffect(() => {
+    if(loading) {
+      loadData();
+    }
+  }, []);
+
+    return (
+      <ThemeProvider theme={theme}>
+        <GlobalStyles/>
+        <div className="main">
+          <Navbar bg={theme.variant} variant={theme.variant} >
+            <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+            <Nav className="mr-auto">
+              <Nav.Link onClick={() => {setPage("chart")}} selected>Chart</Nav.Link>
+              <Nav.Link onClick={() => {setPage("worldmap")}}>Worldmap</Nav.Link>
+              <Nav.Link  onClick={() => {setPage("about")}}>About</Nav.Link>
+            </Nav>
+              <Button onClick={toggleTheme} >{theme.toggle}</Button>
+          </Navbar>
+
+          <ThemeContext.Provider value={theme}>
+          {loading ? 
+            <Container className="justify-content-md-center">
+              <ScaleLoader
+                css={override}
+                color={"#990a06"}
+                loading={loading}
+              />
+            </Container>
+          : 
+            {
+              'chart': <MainChart data={data} lastData={lastData}></MainChart>,
+              'worldmap': <WorldMap data={data} lastData={lastData} min={date}></WorldMap>,
+              'about': <About></About>
+            }[page]
+          }
+          </ThemeContext.Provider>         
+        </div>
+      </ThemeProvider>
+    );
 }
 
 export default App;

@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, {Component, useContext} from 'react';
 import Select from 'react-select'
-import { Form, ToggleButton, ButtonGroup, Container } from 'react-bootstrap';
+import { Form, ToggleButton, ButtonGroup, Container, Card } from 'react-bootstrap';
 import './MainChart.css';
 import Chart from './Chart';
 import Table from './Table';
-import CountryData from './CountryData';
 import getCountryISO2 from "country-iso-3-to-2";
+import { ThemeContext, themes } from '../Themes';
 
 class MainChart extends Component {
   constructor(props) {
@@ -115,43 +115,57 @@ class MainChart extends Component {
 
   render() {
     return (
-      <Container>
-        <div className="content">
+      <ThemeContext.Consumer>
+      {theme => (
+        <Container>
+        {
+          console.log(theme)
+          }
+          <Card>
+              <Select
+                styles={this.style}
+                options={this.country}
+                onChange={this.handleChangeCountry}
+                value={this.country.filter(d => d.value === this.state.select)}/>
+                
+            <ButtonGroup toggle onChange={this.handleChangeMode}>
+              <ToggleButton type="radio" name="radio" defaultChecked value="global">
+                global
+              </ToggleButton>
+              <ToggleButton  type="radio" name="radio" value="par_jour">
+                par jour
+              </ToggleButton>
+            </ButtonGroup>
 
-            <Select
-              styles={this.style}
-              options={this.country}
-              onChange={this.handleChangeCountry}
-              value={this.country.filter(d => d.value === this.state.select)}/>
-
-          <ButtonGroup toggle onChange={this.handleChangeMode}>
-            <ToggleButton type="radio" name="radio" defaultChecked value="global">
-              global
-            </ToggleButton>
-            <ToggleButton  type="radio" name="radio" value="par_jour">
-              par jour
-            </ToggleButton>
-          </ButtonGroup>
-
-          <ButtonGroup toggle onChange={this.handleChangeRange}>
-            <ToggleButton type="radio" name="radio" defaultChecked value={7}>
-              semaine
-            </ToggleButton>
-            <ToggleButton  type="radio" name="radio" value={31}>
-              mois
-            </ToggleButton>
-            <ToggleButton type="radio" name="radio" value={365}>
-              année
-            </ToggleButton>
-          </ButtonGroup>
-        </div>
-        
-        <div className="content-chart">
-          <Chart data={this.state.currentData} mode={this.state.mode}></Chart>
-        </div>
-        
-        <Table data={this.state.currentData} mode={this.state.mode} max={this.state.max}></Table>
-      </Container>
+            <ButtonGroup toggle onChange={this.handleChangeRange}>
+              <ToggleButton type="radio" name="radio" defaultChecked value={7}>
+                semaine
+              </ToggleButton>
+              <ToggleButton  type="radio" name="radio" value={31}>
+                mois
+              </ToggleButton>
+              <ToggleButton type="radio" name="radio" value={365}>
+                année
+              </ToggleButton>
+            </ButtonGroup>
+          </Card>
+          
+          <Card>
+            <Chart data={this.state.currentData} mode={this.state.mode}></Chart>
+          </Card>
+          
+          <Card>
+              <Table 
+                theme={theme}
+                data={this.state.currentData}
+                mode={this.state.mode}
+                max={this.state.max}>
+              </Table>
+          </Card>
+        </Container>
+      )
+      }
+      </ThemeContext.Consumer>
     );
   }
 }
