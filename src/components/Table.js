@@ -1,30 +1,31 @@
 import React from 'react';
 import { Table as Tab } from 'react-bootstrap';
 import { rgb } from 'd3';
+import { addSpaces, toCompactDate } from '../util/converter';
 
 const t = 1;
 
 const Row = ({data}) => (
   <tr>
-  <th>{data.date}</th>
-  <th>{data.total_cases}</th>
-  <th>{data.total_deaths}</th>
+  <th>{toCompactDate(data.date)}</th>
+  <th>{addSpaces(data.total_cases)}</th>
+  <th>{addSpaces(data.total_deaths)}</th>
 </tr>
 );
 
 const ColoredRow = ({data, max}) => (
     <tr>
-      <th >{data.date}</th>
+      <th >{toCompactDate(data.date)}</th>
       {data.cases === 0 ? (
-        <th>{data.new_cases}</th>
+        <th>{addSpaces(data.new_cases)}</th>
       ) : (
-        <th style={{ backgroundColor: rgb(136, 132, 216, data.new_cases/max.cases)}}>{data.new_cases}</th>
+        <th style={{ backgroundColor: rgb(0, 121, 242, data.new_cases/max.cases)}}>{addSpaces(data.new_cases)}</th>
       )}
 
       {data.cases === 0 ? (
         <th>{data.new_deaths}</th>
       ) : (
-        <th style={{ backgroundColor: rgb(153, 10, 6, data.new_deaths/max.deaths)}}>{data.new_deaths}</th>
+        <th style={{ backgroundColor: rgb(153, 10, 6, data.new_deaths/max.deaths)}}>{addSpaces(data.new_deaths)}</th>
       )}
     </tr>
 );
@@ -38,7 +39,7 @@ function Table({data, mode, theme}) {
   } 
 
   return (
-    <Tab bordered hover variant={theme.variant}>
+    <Tab bordered hover variant={theme.variant} striped={mode === "global"}>
       <thead>
       <tr>
         <th>date</th>

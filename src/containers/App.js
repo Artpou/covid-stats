@@ -1,14 +1,17 @@
 import React, { useState, useEffect} from 'react';
+import MainChart from './MainChart';
+import WorldMap from './WorldMap';
+import About from './About';
+
+import { GlobalStyles } from '../styles/globalStyles';
+import { themes, ThemeContext } from '../styles/Themes';
+import Logo from '../assets/covid-stats.png';
+
 import { Navbar, Nav, Container, Button, FormCheck } from 'react-bootstrap';
 import * as d3 from 'd3';
 import { css } from "@emotion/core";
 import ScaleLoader from "react-spinners/ScaleLoader";
-import MainChart from './MainChart/MainChart';
-import WorldMap from './WorldMap/WorldMap';
-import { themes, ThemeContext } from './Themes';
 import { ThemeProvider } from 'styled-components';
-import About from './About/About';
-import { GlobalStyles } from './globalStyles';
 
 const override = css`
 display: block;
@@ -37,7 +40,6 @@ export const App = () =>  {
     );
   }
 
-
   async function loadData() {
     var tmp = [];
     var min;
@@ -49,11 +51,12 @@ export const App = () =>  {
       } else {
         //update du nombre de cas du pays
         //this.lastData[this.lastData.length - 1].total_cases = d.total_cases;
+        if(d.new_cases < 0) d.new_cases = 0;
+        if(d.new_deaths < 0) d.new_deaths = 0;
         tmp[tmp.length-1] = d;
       }
       if(!min || d.date < min) {
         min = d.date;
-        console.log(min);
       }
       return d;
     })
@@ -77,18 +80,29 @@ export const App = () =>  {
     }
   }, []);
 
-    return (
-      <ThemeProvider theme={theme}>
+  return (
+    <ThemeProvider theme={theme}>
         <GlobalStyles/>
         <div className="main">
-          <Navbar bg={theme.variant} variant={theme.variant} >
-            <Navbar.Brand href="#home">Navbar</Navbar.Brand>
-            <Nav className="mr-auto">
-              <Nav.Link onClick={() => {setPage("chart")}} selected>Chart</Nav.Link>
-              <Nav.Link onClick={() => {setPage("worldmap")}}>Worldmap</Nav.Link>
-              <Nav.Link  onClick={() => {setPage("about")}}>About</Nav.Link>
-            </Nav>
-              <Button variant={theme.button_mode} onClick={toggleTheme} >{theme.toggle}</Button>
+          <Navbar bg={theme.variant} variant={theme.variant}  expand="lg">
+            <Navbar.Brand href="#home">
+              <img
+                alt=""
+                src={Logo}
+                width="60"
+                height="60"
+                className="d-inline-block align-top"
+              />
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="mr-auto">
+                <Nav.Link onClick={() => {setPage("chart")}} selected>Chart</Nav.Link>
+                <Nav.Link onClick={() => {setPage("worldmap")}}>Worldmap</Nav.Link>
+                <Nav.Link  onClick={() => {setPage("about")}}>About</Nav.Link>
+              </Nav>
+                <Button variant={theme.button_mode} onClick={toggleTheme} >{theme.toggle}</Button>
+            </Navbar.Collapse>
           </Navbar>
 
           <ThemeContext.Provider value={theme}>

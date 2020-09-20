@@ -2,15 +2,21 @@ import React, { Component } from 'react';
 import { Card, Container } from 'react-bootstrap';
 import Select from 'react-select';
 
-const language = {
-    english: {value:"en",label:<div><img src='https://www.countryflags.io/us/flat/32.png' style={{marginRight: 10, height: 32}}/></div>},
-    french: {value:"fr",label:<div><img src='https://www.countryflags.io/us/flat/32.png' style={{marginRight: 10, height: 32}}/></div>},
-};
+const language = [
+    {value: "en", label: <div><img src='https://www.countryflags.io/us/flat/32.png' style={{marginRight: 10, height: 32}}/></div>},
+    {value: "fr",label: <div><img src='https://www.countryflags.io/fr/flat/32.png' style={{marginRight: 10, height: 32}}/></div>},
+];
 
 const About = () => {
     return (
         <Container>
             <Card>
+                <Select 
+                    className="select-language"
+                    options={language}
+                    color="#000"
+                    />
+
                 <p>Site de visualisation des données du covid-19 en temps réel.
                 Ce site a été réalisé avec React. La base de données est en accès public à l'adresse suivante : 
                 <a href="https://covid.ourworldindata.org/data/owid-covid-data.csv">https://covid.ourworldindata.org/data/owid-covid-data.csv</a></p>

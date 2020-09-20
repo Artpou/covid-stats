@@ -1,15 +1,15 @@
 import { createGlobalStyle} from "styled-components"
 
 export const GlobalStyles = createGlobalStyle`
-.body {
-
-}
-
 .main {
   transition: all 0.25s linear;
   background-color: ${({ theme }) => theme.background};
   color: ${({ theme }) => theme.text};
   min-height: 100vh;
+}
+
+a {
+  color: ${({ theme }) => theme.link};
 }
 
 .btn-group {
@@ -24,11 +24,18 @@ export const GlobalStyles = createGlobalStyle`
 
 .card {
   padding: 10px;
-  margin: 25px;
+  margin-top: 25px;
+  margin-bottom: 25px;
   background-color: ${({ theme }) => theme.card};
 }
 
+.select-language {
+  color: black;
+  max-width: 150px;
+}
+
 .select-country {
+  padding: 10px;
   color: black;
 }
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import RangeSlider from 'react-bootstrap-range-slider';
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
-const Slider = ({data, min, setFilter}) => {
+const Slider = ({data, min, setFilter, theme}) => {
   const [ value, setValue ] = useState(0);
   var minDay = (new Date(min)-new Date(Date.now())) / (1000 * 3600 * 24);
 
@@ -20,7 +20,7 @@ const Slider = ({data, min, setFilter}) => {
         value={value}
         min={Math.round(minDay)}
         max={0}
-        variant='light'
+        variant={theme.default}
         onChange={event => {
               setValue(Number(event.target.value));
               console.log(event.target.value);
